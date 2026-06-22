@@ -520,6 +520,9 @@ export const anthropicSettings = {
   promptCache: {
     default: true as const,
   },
+  promptCacheTtl: {
+    default: undefined,
+  },
   thinking: {
     default: true as const,
   },
@@ -810,6 +813,14 @@ export const tMessageSchema = z.object({
    * what actually ran, not the current catalog).
    */
   alwaysAppliedSkills: z.array(z.string()).optional(),
+  /**
+   * Verbatim excerpts the user quoted (via the "Add to chat" selection
+   * popup) to reference on this turn. UI metadata that `MessageQuotes`
+   * renders above the user bubble so the references persist on reload. The
+   * excerpts are merged into the user message text sent to the model at
+   * request time and counted in the user message token count.
+   */
+  quotes: z.array(z.string()).optional(),
 });
 
 export type MemoryArtifact = {
@@ -909,6 +920,7 @@ export const tConversationSchema = z.object({
   max_tokens: coerceNumber.optional(),
   /* Anthropic */
   promptCache: z.boolean().optional(),
+  promptCacheTtl: z.enum(['5m', '1h']).optional(),
   system: z.string().optional(),
   thinking: z.boolean().optional(),
   thinkingBudget: coerceNumber.optional(),
@@ -1062,6 +1074,7 @@ export const tQueryParamsSchema = tConversationSchema
     maxOutputTokens: true,
     /** @endpoints anthropic */
     promptCache: true,
+    promptCacheTtl: true,
     thinking: true,
     thinkingBudget: true,
     thinkingLevel: true,
@@ -1368,7 +1381,7 @@ export const openAISchema = openAIBaseSchema
   .catch(() => ({}));
 
 export const openRouterSchema = openAIBaseSchema
-  .merge(tConversationSchema.pick({ promptCache: true }))
+  .merge(tConversationSchema.pick({ promptCache: true, promptCacheTtl: true }))
   .transform((obj: Partial<TConversation>) => removeNullishValues(obj, true))
   .catch(() => ({}));
 
@@ -1403,6 +1416,7 @@ export const anthropicBaseSchema = tConversationSchema.pick({
   topK: true,
   resendFiles: true,
   promptCache: true,
+  promptCacheTtl: true,
   thinking: true,
   thinkingBudget: true,
   effort: true,
