@@ -1,0 +1,30 @@
+# Docker Swarm stack — converted from docker-compose.ferretdb.yml
+# Deploy: docker stack deploy -c docker-stack.ferretdb.yml ferretdb
+
+services:
+  ferretdb-postgres:
+    image: ghcr.io/ferretdb/postgres-documentdb:17-0.107.0-ferretdb-2.7.0
+    environment:
+      - POSTGRES_USER=ferretdb
+      - POSTGRES_PASSWORD=ferretdb
+      - POSTGRES_DB=postgres
+    volumes:
+      - ferretdb_data:/var/lib/postgresql/data
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  ferretdb:
+    image: ghcr.io/ferretdb/ferretdb:2.7.0
+    ports:
+      - "27020:27017"
+    environment:
+      - FERRETDB_POSTGRESQL_URL=postgres://ferretdb:ferretdb@ferretdb-postgres:5432/postgres
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+volumes:
+  ferretdb_data:
