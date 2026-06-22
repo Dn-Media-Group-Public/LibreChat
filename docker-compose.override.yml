@@ -1,0 +1,10 @@
+# Local overrides for the Swarm stack.
+# Deploy: source .env && docker stack deploy -c docker-compose.yml -c docker-compose.override.yml librechat
+
+services:
+  api:
+    environment:
+      - MCP_ARTICLE_GRAPH_API_KEY=${MCP_ARTICLE_GRAPH_API_KEY}
+    volumes:
+      - ./librechat-vertex-sa.json:/app/librechat-vertex-sa.json:ro
+      - ./librechat.yaml:/app/librechat.yaml:ro
