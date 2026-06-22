@@ -29,6 +29,8 @@ services:
       - ./uploads:/app/uploads
       - ./logs:/app/logs
       - ./skill:/app/skill
+      - ./librechat.yaml:/app/librechat.yaml:ro
+      - ./librechat-vertex-sa.json:/app/librechat-vertex-sa.json:ro
     deploy:
       replicas: 1
       restart_policy:
